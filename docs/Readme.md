@@ -1,4 +1,7 @@
-# Readme
+---
+editor: visual
+toc-title: Table of contents
+---
 
-This github repository is for Joel Parker’s blog found
-[here](https://joelparkeruofa.github.io/JoelParkerBlog/)
+This github repository is for Joel Parker's blog
+https://joelparkeruofa.github.io/JoelParkerBlog/

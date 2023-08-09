@@ -10,7 +10,6 @@ about:
       href: https://github.com/JoelParkerUofA
 ---
 
-
 Hello! My name is Joel Parker and I am a Ph.D student in Biostatistics at the University of Arizona. I am developing this blog to provide a place to share my journey through the later years of my Ph.D with a broader audience. In doing this, I hope to accomplish two goals.
 
   1.  Share what I am learning as a Ph.D student in Biostatistics.
