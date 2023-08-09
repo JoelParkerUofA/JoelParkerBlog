@@ -4,34 +4,20 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this blog"
+    "text": "Hello! My name is Joel Parker and I am a Ph.D student in Biostatistics at the University of Arizona. I am developing this blog to provide a place to share my journey through the later years of my Ph.D with a broader audience. In doing this, I hope to accomplish two goals.\n\nShare what I am learning as a Ph.D student in Biostatistics.\nTo grow as a scientist, author and communicator.\n\nAs a Ph.D student I have found great pleasure in reading blogs written by some of my statistical heroes like Andrew Gelman and Frank Harrell, which has partially inspired me to start this blog. Another inspiration is to connect with other young scientists who are at a similar stage in their career as me, because I believe we can learn from each other. Therefore, I welcome feedback and suggestions to what you found useful or if you have found a better way.\nI look forward to connecting with you!\nJoel Parker"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Joel Parker Blog",
     "section": "",
-    "text": "Post With Code\n\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nAug 8, 2023\n\n\nJoel Parker\n\n\n\n\n\n\n  \n\n\n\n\nPost With Code\n\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nAug 8, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n  \n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nAug 5, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/Mynewpost/index.html",
-    "href": "posts/Mynewpost/index.html",
-    "title": "Post With Code",
-    "section": "",
-    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
-    "section": "",
-    "text": "This is a post with executable code.\n\n1 + 1\n\n[1] 2"
+    "text": "Welcome To My Blog\n\n\n\n\n\n\n\nBioinformatics\n\n\nStatistics\n\n\nOpinion\n\n\nTutorial\n\n\n\n\n\n\n\n\n\n\n\nAug 5, 2023\n\n\nJoel Parker\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/welcome/index.html",
     "href": "posts/welcome/index.html",
     "title": "Welcome To My Blog",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "Hello! My name is Joel Parker and I am a Ph.D student in Biostatistics at the University of Arizona. I am developing this blog to provide a place to share my journey through the later years of my Ph.D with a broader audience. In doing this, I hope to accomplish two goals.\n\nShare what I am learning as a Ph.D student in Biostatistics.\nTo grow as a scientist, author and communicator.\n\nAs a Ph.D student I have found great pleasure in reading blogs written by some of my statistical heroes like Andrew Gelman and Frank Harrell, which has partially inspired me to start this blog. Another inspiration is to connect with other young scientists who are at a similar stage in their career as me, because I believe we can learn from each other. Therefore, I welcome feedback and suggestions to what you found useful or if you have found a better way.\nI look forward to connecting with you!\nJoel Parker"
   }
 ]

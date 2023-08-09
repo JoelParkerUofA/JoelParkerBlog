@@ -3,14 +3,15 @@ project:
   output-dir: docs
 
 website:
-  title: "JoelParkerBlog"
+  title: "Joel Parker's Blog"
   navbar:
-    right:
-      - about.qmd
-      - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+    right: 
+    - about.qmd
+    - icon: twitter
+      href: https://twitter.com/JoelParker_Stat
+    - icon: github
+      href: https://github.com/JoelParkerUofA
+
 format:
   html:
     theme: cosmo
