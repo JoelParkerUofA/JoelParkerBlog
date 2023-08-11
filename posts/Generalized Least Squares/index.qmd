@@ -1,0 +1,114 @@
+---
+title: "The Step From Mixed Models to Generalized Least Squares"
+author: "Joel Parker"
+date: "2023-08-05"
+link-citations: true
+categories: [Statistics, Tutorial]
+---
+
+## Issues with basic mixed models
+
+We often used mixed effect models in practice when dealing with repeated measures types of experiments or clustered data. However, one of the draw backs of mixed models is that they assume the within-group errors $e_i$ are heteroskedastic (equal variance) and uncorrelated. There are many applications where this is not the case, and the within group error are not heteroskedastic or are correlated. One example of this is in a longitudinal analysis where we are collecting repeated measures from an individual over time. One method for modeling this type of data is to use a random intercept model which is going to assume that the within subject error is independent and heteroskedastics. In other words, we are assuming that the observations from the same person are interchangeable. The issue arises when thinking about the nature of longitudinal data, such that measurements from the same subject are going to be more correlated if they were measured closer in time than measurements that were measured farther apart in time. This induces a correlation structure to the data that is not accounted for with the standard random intercept model. Frank Harrell goes into detail about the compound symmetric correlation structure induced by the random intercept models and why this is not an appropriate way to model longitudinal data in many cases, this article can be found [here](https://www.fharrell.com/post/re/).
+
+For this article we will discussing how the basic mixed effects model can be extended to allow for herteroskedastic and correlated within-group errors. The details of this post are as described in [Mixed-Effects Models in S and S-Plus](https://link.springer.com/chapter/10.1007/0-387-22747-4_3) [@pinheiro2006mixed], chapter 5.
+
+## Mixed Effects Model
+
+To see how we can extend mixed effects models, we will first show the mixed model formulation for a single level. Below is a table of symbols used in the modeling that can be refereed to throughout this blog.
+
+| Symbol         | Dimensions       | Representation                               |
+|-----------------|-----------------|--------------------------------------|
+| $y$            |                  | Continuous Outcome                           |
+| $i$            |                  | Group (Cluster) number                       |
+| $n_i$          |                  | Number of observations in the $i^{th}$ group |
+| $\mathbf{y}_i$ | $n_i \times 1$   | Outcome vector for the $i^{th}$ group        |
+| $M$            |                  | number of groups                             |
+| $p$            |                  | number of fixed effects                      |
+| $\mathbf{b}$   | $q\times 1$      | matrix of random effects                     |
+| $\mathbf{Z_i}$ | $n_i \times q$   | Random effects regression matrix             |
+| $\mathbf{X}_i$ | $n_i \times p$   | Fixed effects regression matrix              |
+| $\beta$        | $p \times 1$     | Vector of fixed effects                      |
+| $\Lambda$      | $n_i \times n_i$ | Covariance matrix for within group errors    |
+
+Assume we have a continuous outcome variable $y$. All $n_i$ observations from the $i^{th}$ group are expressed in an $n_i$ dimensional vector $\mathbf{Y}_i$. We can model $\mathbf{y}_i$ as:
+
+$$
+\mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta + \mathbf{Z}_i\mathbf{b}_i + \epsilon_i,  i=1 , \dots, M \\
+\mathbf{b}_i \sim \mathbf{N}(0, \Sigma_{q\times q}), \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i})
+$$
+Where $\beta$ is a $p$ dimensional vector of fixed effects, $\mathbf{X}_i$ is a $n_i \times p$ fixed effects matrix, $\mathbf{Z_i}$ is a $n_i \times q$ random effects matrix and $\mathbf{b}$ is a vector of random effects.
+
+There are two distributional assumptions made for this model, the first is that the random effects follow a multi-variate normal distribution centered at $\mathbf{0}$ with a covariance matrix $\Sigma_{q \times q}$. The second assumption is on the model errors $\epsilon_i$, which is the within group error matrix, which follows a normal distribution centered at $\mathbf{0}$ with $Var(\epsilon_i) = \sigma^2 \mathbf{I}$. We therefore, are placing the assumption that the within group errors are independent and identically distributed. Furthermore, this assumption may not hold for many correlation structures in practice, like longitudinal data analysis.
+
+Pinheiro and Bates outline how to fit this model in chapter 2 of [@pinheiro2006mixed]. I will not go into detail here, but the methods used to fit the model above will be use full for fitting the generalized least squares model defined in the next section.
+
+## Relaxing Assumptions of mixed models.
+
+As discussed the previous section, the assumptions placed within group error $\epsilon_i$ may may be violated for many applications, and we may need to relax this assumption. Here, we define an extended single-level mixed effects model that relaxes this assumption by allowing heteroskedastic and within group errors.
+
+$$
+\begin{aligned}
+\mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta + \mathbf{Z}_i\mathbf{b}_i + \epsilon_i,  i=1 , \dots, M \\
+\mathbf{b}_i \sim \mathbf{N}(0, \Sigma_{q\times q}), \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2\Lambda_{i: n_i \times n_i})
+\end{aligned}
+$$
+
+Here, the only difference between the two models is the assumption of covariance
+matrix for the within group error, $\mathbf{e}_i$, was changed to a more flexible,
+covariance matrix $\Lambda_i$ which is parameterized by a small set of parameters
+$\lambda$. Similarly, to the first model the $\epsilon_i$ are assumed to be independent
+for different $i$ and independent from the random effect $\mathbf{b}_i$.
+
+This extended mixed model can be fit by utilizing the fact that covariance matrices
+are symmetric and positive semi-definite and therefore $\Lambda$ has an invertable
+square root $\Lambda^{-1/2}$. We can perform a linear transformation of $\mathbf{Y}_i$, 
+$\mathbf{X}_i$, $\mathbf{Z}_i$ and $\epsilon$ by $\Lambda_i^{-1/2}$ such that:
+
+$$
+\begin{cases}
+\mathbf{Y}_i^* = (\Lambda_i^{-1/2})^T \mathbf{Y}_i & \mathbf{X}_i^* = (\Lambda_i^{-1/2})^T \mathbf{X}_i \\
+\mathbf{Z}_i^* = (\Lambda_i^{-1/2})^T\mathbf{Z}_i & \epsilon^*_i = (\Lambda_i^{-1/2})^T \epsilon_i^*,
+\end{cases}
+$$
+After this linear transformation it can be shown that $\epsilon^*_i\sim \mathcal{N}(\mathbf{0},\sigma^2\mathbf{I})$. Therefore, we can rewrite the extended
+single level model as:
+$$
+\mathbf{Y_i}^*_{n_i \times 1} = \mathbf{X}^*_i\beta + \mathbf{Z}^*_i\mathbf{b}_i + \epsilon^*_i,  i=1 , \dots, M \\
+\mathbf{b}_i \sim \mathbf{N}(0, \Sigma_{q\times q}), \ \epsilon^*_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i}),
+$$
+
+Which takes the same form as the basic mixed model and can be solved with the same
+methods discussed in chapter 2 of [@pinheiro2006mixed]. 
+
+
+
+## Generalized Least Squares
+One important thing to note, is that if we are not be interested in the random 
+effects of the model we can choose to not incorporate them into the model. To do 
+this we use the within-group component $\Lambda_i$ to directly model the variance-covariance 
+matrix as seen below. 
+
+$$
+\mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta  + \epsilon_i,  i=1 , \dots, M \\
+ \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2\Lambda_{i: n_i \times n_i})
+$$
+
+forming the generalized least squares model. Similar to the extended mixed model
+above, we can transform the model matrices by $\Lambda^{-1/2}$ leading to a "classic"
+linear regression problem
+
+$$
+\mathbf{Y_i}^*_{n_i \times 1} = \mathbf{X}^*_i\beta + \epsilon^*_i,  i=1 , \dots, M \\
+ \epsilon^*_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i})
+$$
+Therefore, the estimators for $\hat{\beta}$ and $\hat{\sigma}^2$ are found by solving
+the ordinary least squares problem for given values of $\lambda$. 
+
+$$
+\hat{\beta}(\lambda) = [(\mathbf{X}^*)^T\mathbf{X}^*]^{-1}(\mathbf{X}^*)\mathbf{Y}^* \\ 
+\hat{\sigma}^2(\lambda) = \frac{\|\mathbf{Y}^* - \mathbf{X}^*\hat{\beta}(\lambda)\|}{N}
+$$
+The optimal value for $\Lambda$ is found by maximizing the profiled log-likelihood
+as described in [@pinheiro2006mixed].
+
+
