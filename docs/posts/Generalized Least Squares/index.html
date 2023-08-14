@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -76,7 +76,8 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -177,9 +178,9 @@ div.csl-indent {
 <p>To see how we can extend mixed effects models, we will first show the mixed model formulation for a single level. Below is a table of symbols used in the modeling that can be refereed to throughout this blog.</p>
 <table class="table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 23%">
-<col style="width: 52%">
+<col style="width: 24%">
+<col style="width: 24%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -248,8 +249,10 @@ div.csl-indent {
 </table>
 <p>Assume we have a continuous outcome variable <span class="math inline">\(y\)</span>. All <span class="math inline">\(n_i\)</span> observations from the <span class="math inline">\(i^{th}\)</span> group are expressed in an <span class="math inline">\(n_i\)</span> dimensional vector <span class="math inline">\(\mathbf{Y}_i\)</span>. We can model <span class="math inline">\(\mathbf{y}_i\)</span> as:</p>
 <p><span class="math display">\[
+\begin{aligned}
 \mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta + \mathbf{Z}_i\mathbf{b}_i + \epsilon_i,  i=1 , \dots, M \\
 \mathbf{b}_i \sim \mathbf{N}(0, \Sigma_{q\times q}), \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i})
+\end{aligned}
 \]</span> Where <span class="math inline">\(\beta\)</span> is a <span class="math inline">\(p\)</span> dimensional vector of fixed effects, <span class="math inline">\(\mathbf{X}_i\)</span> is a <span class="math inline">\(n_i \times p\)</span> fixed effects matrix, <span class="math inline">\(\mathbf{Z_i}\)</span> is a <span class="math inline">\(n_i \times q\)</span> random effects matrix and <span class="math inline">\(\mathbf{b}\)</span> is a vector of random effects.</p>
 <p>There are two distributional assumptions made for this model, the first is that the random effects follow a multi-variate normal distribution centered at <span class="math inline">\(\mathbf{0}\)</span> with a covariance matrix <span class="math inline">\(\Sigma_{q \times q}\)</span>. The second assumption is on the model errors <span class="math inline">\(\epsilon_i\)</span>, which is the within group error matrix, which follows a normal distribution centered at <span class="math inline">\(\mathbf{0}\)</span> with <span class="math inline">\(Var(\epsilon_i) = \sigma^2 \mathbf{I}\)</span>. We therefore, are placing the assumption that the within group errors are independent and identically distributed. Furthermore, this assumption may not hold for many correlation structures in practice, like longitudinal data analysis.</p>
 <p>Pinheiro and Bates outline how to fit this model in chapter 2 of <span class="citation" data-cites="pinheiro2006mixed">(<a href="#ref-pinheiro2006mixed" role="doc-biblioref">Pinheiro and Bates 2006</a>)</span>. I will not go into detail here, but the methods used to fit the model above will be use full for fitting the generalized least squares model defined in the next section.</p>
@@ -270,9 +273,13 @@ div.csl-indent {
 \mathbf{Y}_i^* = (\Lambda_i^{-1/2})^T \mathbf{Y}_i &amp; \mathbf{X}_i^* = (\Lambda_i^{-1/2})^T \mathbf{X}_i \\
 \mathbf{Z}_i^* = (\Lambda_i^{-1/2})^T\mathbf{Z}_i &amp; \epsilon^*_i = (\Lambda_i^{-1/2})^T \epsilon_i^*,
 \end{cases}
-\]</span> After this linear transformation it can be shown that <span class="math inline">\(\epsilon^*_i\sim \mathcal{N}(\mathbf{0},\sigma^2\mathbf{I})\)</span>. Therefore, we can rewrite the extended single level model as: <span class="math display">\[
+\]</span></p>
+<p>After this linear transformation it can be shown that <span class="math inline">\(\epsilon^*_i\sim \mathcal{N}(\mathbf{0},\sigma^2\mathbf{I})\)</span>. Therefore, we can rewrite the extended single level model as:</p>
+<p><span class="math display">\[
+\begin{aligned}
 \mathbf{Y_i}^*_{n_i \times 1} = \mathbf{X}^*_i\beta + \mathbf{Z}^*_i\mathbf{b}_i + \epsilon^*_i,  i=1 , \dots, M \\
 \mathbf{b}_i \sim \mathbf{N}(0, \Sigma_{q\times q}), \ \epsilon^*_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i}),
+\end{aligned}
 \]</span></p>
 <p>Which takes the same form as the basic mixed model and can be solved with the same methods discussed in chapter 2 of <span class="citation" data-cites="pinheiro2006mixed">(<a href="#ref-pinheiro2006mixed" role="doc-biblioref">Pinheiro and Bates 2006</a>)</span>.</p>
 </section>
@@ -280,18 +287,24 @@ div.csl-indent {
 <h2 class="anchored" data-anchor-id="generalized-least-squares">Generalized Least Squares</h2>
 <p>One important thing to note, is that if we are not be interested in the random effects of the model we can choose to not incorporate them into the model. To do this we use the within-group component <span class="math inline">\(\Lambda_i\)</span> to directly model the variance-covariance matrix as seen below.</p>
 <p><span class="math display">\[
+\begin{aligned}
 \mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta  + \epsilon_i,  i=1 , \dots, M \\
 \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2\Lambda_{i: n_i \times n_i})
+\end{aligned}
 \]</span></p>
 <p>forming the generalized least squares model. Similar to the extended mixed model above, we can transform the model matrices by <span class="math inline">\(\Lambda^{-1/2}\)</span> leading to a “classic” linear regression problem</p>
 <p><span class="math display">\[
+\begin{aligned}
 \mathbf{Y_i}^*_{n_i \times 1} = \mathbf{X}^*_i\beta + \epsilon^*_i,  i=1 , \dots, M \\
 \epsilon^*_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i})
-\]</span> Therefore, the estimators for <span class="math inline">\(\hat{\beta}\)</span> and <span class="math inline">\(\hat{\sigma}^2\)</span> are found by solving the ordinary least squares problem for given values of <span class="math inline">\(\lambda\)</span>.</p>
+\end{aligned}
+\]</span></p>
+<p>Therefore, the estimators for <span class="math inline">\(\hat{\beta}\)</span> and <span class="math inline">\(\hat{\sigma}^2\)</span> are found by solving the ordinary least squares problem for given values of <span class="math inline">\(\lambda\)</span>.</p>
 <p><span class="math display">\[
 \hat{\beta}(\lambda) = [(\mathbf{X}^*)^T\mathbf{X}^*]^{-1}(\mathbf{X}^*)\mathbf{Y}^* \\
 \hat{\sigma}^2(\lambda) = \frac{\|\mathbf{Y}^* - \mathbf{X}^*\hat{\beta}(\lambda)\|}{N}
-\]</span> The optimal value for <span class="math inline">\(\Lambda\)</span> is found by maximizing the profiled log-likelihood as described in <span class="citation" data-cites="pinheiro2006mixed">(<a href="#ref-pinheiro2006mixed" role="doc-biblioref">Pinheiro and Bates 2006</a>)</span>.</p>
+\]</span></p>
+<p>The optimal values for <span class="math inline">\(\lambda\)</span> is found by maximizing the profiled log-likelihood as described in <span class="citation" data-cites="pinheiro2006mixed">(<a href="#ref-pinheiro2006mixed" role="doc-biblioref">Pinheiro and Bates 2006</a>)</span>.</p>
 
 
 

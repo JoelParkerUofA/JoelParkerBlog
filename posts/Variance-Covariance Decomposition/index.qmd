@@ -1,0 +1,47 @@
+---
+title: "Within Group Variance Decomposition"
+author: "Joel Parker"
+date: "2023-08-14"
+link-citations: true
+categories: [Statistics, Tutorial]
+---
+
+## Introductions
+
+In the last post, [The Steps from Mixed Models to Generalized Least Squares](https://joelparkeruofa.github.io/JoelParkerBlog/posts/Generalized%20Least%20Squares/), I discussed how we can relax the assumption of the within group independence of the errors, and allow for correlations in the residuals and heterogeneity of errors. In this post I will discuss how we can decompose the within group variance-covariance matrix, $\Lambda_i$ to allow us to model the heterogenity and the correlation structures of the data separately and combine them into a flexible family of models. The information persented in this blog can be viewed as a summary of section 5.1.3 and 5.2 of Mixed effects Models in S and S-plus [@pinheiro2006mixed]
+
+## Generalized Least Squares Review
+
+To demonstrate these ideas we will be using a generalized least quares model (GLS),
+but these ideas can also be extended to mixed models as well. Below is a table of 
+notations you can reference throughout this blog. 
+
+| Symbol         | Dimensions       | Representation                               |
+|------------------|------------------|-----------------------------------|
+| $y$            |                  | Continuous Outcome                           |
+| $i$            |                  | Group (Cluster) number                       |
+| $n_i$          |                  | Number of observations in the $i^{th}$ group |
+| $\mathbf{y}_i$ | $n_i \times 1$   | Outcome vector for the $i^{th}$ group        |
+| $M$            |                  | number of groups                             |
+| $p$            |                  | number of fixed effects                      |
+| $\mathbf{b}$   | $q\times 1$      | matrix of random effects                     |
+| $\mathbf{Z_i}$ | $n_i \times q$   | Random effects regression matrix             |
+| $\mathbf{X}_i$ | $n_i \times p$   | Fixed effects regression matrix              |
+| $\beta$        | $p \times 1$     | Vector of fixed effects                      |
+| $\Lambda$      | $n_i \times n_i$ | Covariance matrix for within group errors    |
+
+We will start with a review of the GLS model disscussed [here](https://joelparkeruofa.github.io/JoelParkerBlog/posts/Generalized%20Least%20Squares/). Assume we have a continuous outcome variable $y$. All $n_i$ observations from the $i^{th}$ group are expressed in an $n_i$ dimensional vector $\mathbf{Y}_i$. We can model $\mathbf{y}_i$ as:
+
+$$
+\begin{aligned}
+\mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta  + \epsilon_i,  i=1 , \dots, M \\
+ \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2\Lambda_{i: n_i \times n_i})
+\end{aligned}
+$$
+
+Where $\beta$ is a $p$ dimensional vector of fixed effects, $\mathbf{X}_i$ is a $n_i \times p$ fixed effects matrix, 
+and $\Lambda_i$ is the variance-covarince matrix for the $i^{th}$ group. 
+
+
+## Within Group Variance Decomposition
+

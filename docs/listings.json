@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Variance-Covariance Decomposition/index.html",
       "/posts/Generalized Least Squares/index.html",
       "/posts/welcome/index.html"
     ]

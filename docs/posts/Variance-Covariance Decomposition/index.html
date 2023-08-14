@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Joel Parker">
-<meta name="dcterms.date" content="2023-08-05">
+<meta name="dcterms.date" content="2023-08-14">
 
-<title>Joel Parker’s Blog - Welcome To My Blog</title>
+<title>Joel Parker’s Blog - Within Group Variance Decomposition</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,7 +22,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -62,6 +81,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -108,11 +129,9 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Welcome To My Blog</h1>
+      <h1 class="title">Within Group Variance Decomposition</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">Bioinformatics</div>
                 <div class="quarto-category">Statistics</div>
-                <div class="quarto-category">Opinion</div>
                 <div class="quarto-category">Tutorial</div>
               </div>
                   </div>
@@ -131,7 +150,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">August 5, 2023</p>
+        <p class="date">August 14, 2023</p>
       </div>
     </div>
     
@@ -149,19 +168,105 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p><img src="thumbnail.jpg" class="img-fluid"></p>
-<p>Hello! My name is Joel Parker and I am a Ph.D student in Biostatistics at the University of Arizona. I am developing this blog to provide a place to share my journey through the later years of my Ph.D with a broader audience. In doing this, I hope to accomplish two goals.</p>
-<ol type="1">
-<li><p>Share what I am learning as a Ph.D student in Biostatistics.</p></li>
-<li><p>To grow as a scientist, author and communicator.</p></li>
-</ol>
-<p>As a Ph.D student I have found great pleasure in reading blogs written by some of my statistical heroes like <a href="https://statmodeling.stat.columbia.edu/">Andrew Gelman</a> and <a href="https://www.fharrell.com/#posts">Frank Harrell</a>, which has partially inspired me to start this blog. Another inspiration is to connect with other young scientists who are at a similar stage in their career as me, because I believe we can learn from each other. Therefore, I welcome feedback and suggestions to what you found useful or if you have found a better way.</p>
-<p>I look forward to connecting with you!</p>
-<p><strong>Joel Parker</strong></p>
+<section id="introductions" class="level2">
+<h2 class="anchored" data-anchor-id="introductions">Introductions</h2>
+<p>In the last post, <a href="https://joelparkeruofa.github.io/JoelParkerBlog/posts/Generalized%20Least%20Squares/">The Steps from Mixed Models to Generalized Least Squares</a>, I discussed how we can relax the assumption of the within group independence of the errors, and allow for correlations in the residuals and heterogeneity of errors. In this post I will discuss how we can decompose the within group variance-covariance matrix, <span class="math inline">\(\Lambda_i\)</span> to allow us to model the heterogenity and the correlation structures of the data separately and combine them into a flexible family of models. The information persented in this blog can be viewed as a summary of section 5.1.3 and 5.2 of Mixed effects Models in S and S-plus <span class="citation" data-cites="pinheiro2006mixed">(<a href="#ref-pinheiro2006mixed" role="doc-biblioref">Pinheiro and Bates 2006</a>)</span></p>
+</section>
+<section id="generalized-least-squares-review" class="level2">
+<h2 class="anchored" data-anchor-id="generalized-least-squares-review">Generalized Least Squares Review</h2>
+<p>To demonstrate these ideas we will be using a generalized least quares model (GLS), but these ideas can also be extended to mixed models as well. Below is a table of notations you can reference throughout this blog.</p>
+<table class="table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Dimensions</th>
+<th>Representation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(y\)</span></td>
+<td></td>
+<td>Continuous Outcome</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(i\)</span></td>
+<td></td>
+<td>Group (Cluster) number</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(n_i\)</span></td>
+<td></td>
+<td>Number of observations in the <span class="math inline">\(i^{th}\)</span> group</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf{y}_i\)</span></td>
+<td><span class="math inline">\(n_i \times 1\)</span></td>
+<td>Outcome vector for the <span class="math inline">\(i^{th}\)</span> group</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(M\)</span></td>
+<td></td>
+<td>number of groups</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(p\)</span></td>
+<td></td>
+<td>number of fixed effects</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf{b}\)</span></td>
+<td><span class="math inline">\(q\times 1\)</span></td>
+<td>matrix of random effects</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf{Z_i}\)</span></td>
+<td><span class="math inline">\(n_i \times q\)</span></td>
+<td>Random effects regression matrix</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf{X}_i\)</span></td>
+<td><span class="math inline">\(n_i \times p\)</span></td>
+<td>Fixed effects regression matrix</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\beta\)</span></td>
+<td><span class="math inline">\(p \times 1\)</span></td>
+<td>Vector of fixed effects</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\Lambda\)</span></td>
+<td><span class="math inline">\(n_i \times n_i\)</span></td>
+<td>Covariance matrix for within group errors</td>
+</tr>
+</tbody>
+</table>
+<p>We will start with a review of the GLS model disscussed <a href="https://joelparkeruofa.github.io/JoelParkerBlog/posts/Generalized%20Least%20Squares/">here</a>. Assume we have a continuous outcome variable <span class="math inline">\(y\)</span>. All <span class="math inline">\(n_i\)</span> observations from the <span class="math inline">\(i^{th}\)</span> group are expressed in an <span class="math inline">\(n_i\)</span> dimensional vector <span class="math inline">\(\mathbf{Y}_i\)</span>. We can model <span class="math inline">\(\mathbf{y}_i\)</span> as:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta  + \epsilon_i,  i=1 , \dots, M \\
+\ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2\Lambda_{i: n_i \times n_i})
+\end{aligned}
+\]</span></p>
+<p>Where <span class="math inline">\(\beta\)</span> is a <span class="math inline">\(p\)</span> dimensional vector of fixed effects, <span class="math inline">\(\mathbf{X}_i\)</span> is a <span class="math inline">\(n_i \times p\)</span> fixed effects matrix, and <span class="math inline">\(\Lambda_i\)</span> is the variance-covarince matrix for the <span class="math inline">\(i^{th}\)</span> group.</p>
+</section>
+<section id="within-group-variance-decomposition" class="level2">
 
 
 
-</main> <!-- /main -->
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Within Group Variance Decomposition</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-pinheiro2006mixed" class="csl-entry" role="listitem">
+Pinheiro, José, and Douglas Bates. 2006. <em>Mixed-Effects Models in s and s-PLUS</em>. Springer science &amp; business media.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -17,7 +17,7 @@ For this article we will discussing how the basic mixed effects model can be ext
 To see how we can extend mixed effects models, we will first show the mixed model formulation for a single level. Below is a table of symbols used in the modeling that can be refereed to throughout this blog.
 
 | Symbol         | Dimensions       | Representation                               |
-|-----------------|-----------------|--------------------------------------|
+|------------------|------------------|-------------------------------------|
 | $y$            |                  | Continuous Outcome                           |
 | $i$            |                  | Group (Cluster) number                       |
 | $n_i$          |                  | Number of observations in the $i^{th}$ group |
@@ -33,10 +33,11 @@ To see how we can extend mixed effects models, we will first show the mixed mode
 Assume we have a continuous outcome variable $y$. All $n_i$ observations from the $i^{th}$ group are expressed in an $n_i$ dimensional vector $\mathbf{Y}_i$. We can model $\mathbf{y}_i$ as:
 
 $$
+\begin{aligned}
 \mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta + \mathbf{Z}_i\mathbf{b}_i + \epsilon_i,  i=1 , \dots, M \\
 \mathbf{b}_i \sim \mathbf{N}(0, \Sigma_{q\times q}), \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i})
-$$
-Where $\beta$ is a $p$ dimensional vector of fixed effects, $\mathbf{X}_i$ is a $n_i \times p$ fixed effects matrix, $\mathbf{Z_i}$ is a $n_i \times q$ random effects matrix and $\mathbf{b}$ is a vector of random effects.
+\end{aligned}
+$$ Where $\beta$ is a $p$ dimensional vector of fixed effects, $\mathbf{X}_i$ is a $n_i \times p$ fixed effects matrix, $\mathbf{Z_i}$ is a $n_i \times q$ random effects matrix and $\mathbf{b}$ is a vector of random effects.
 
 There are two distributional assumptions made for this model, the first is that the random effects follow a multi-variate normal distribution centered at $\mathbf{0}$ with a covariance matrix $\Sigma_{q \times q}$. The second assumption is on the model errors $\epsilon_i$, which is the within group error matrix, which follows a normal distribution centered at $\mathbf{0}$ with $Var(\epsilon_i) = \sigma^2 \mathbf{I}$. We therefore, are placing the assumption that the within group errors are independent and identically distributed. Furthermore, this assumption may not hold for many correlation structures in practice, like longitudinal data analysis.
 
@@ -53,16 +54,9 @@ $$
 \end{aligned}
 $$
 
-Here, the only difference between the two models is the assumption of covariance
-matrix for the within group error, $\mathbf{e}_i$, was changed to a more flexible,
-covariance matrix $\Lambda_i$ which is parameterized by a small set of parameters
-$\lambda$. Similarly, to the first model the $\epsilon_i$ are assumed to be independent
-for different $i$ and independent from the random effect $\mathbf{b}_i$.
+Here, the only difference between the two models is the assumption of covariance matrix for the within group error, $\mathbf{e}_i$, was changed to a more flexible, covariance matrix $\Lambda_i$ which is parameterized by a small set of parameters $\lambda$. Similarly, to the first model the $\epsilon_i$ are assumed to be independent for different $i$ and independent from the random effect $\mathbf{b}_i$.
 
-This extended mixed model can be fit by utilizing the fact that covariance matrices
-are symmetric and positive semi-definite and therefore $\Lambda$ has an invertable
-square root $\Lambda^{-1/2}$. We can perform a linear transformation of $\mathbf{Y}_i$, 
-$\mathbf{X}_i$, $\mathbf{Z}_i$ and $\epsilon$ by $\Lambda_i^{-1/2}$ such that:
+This extended mixed model can be fit by utilizing the fact that covariance matrices are symmetric and positive semi-definite and therefore $\Lambda$ has an invertable square root $\Lambda^{-1/2}$. We can perform a linear transformation of $\mathbf{Y}_i$, $\mathbf{X}_i$, $\mathbf{Z}_i$ and $\epsilon$ by $\Lambda_i^{-1/2}$ such that:
 
 $$
 \begin{cases}
@@ -70,45 +64,43 @@ $$
 \mathbf{Z}_i^* = (\Lambda_i^{-1/2})^T\mathbf{Z}_i & \epsilon^*_i = (\Lambda_i^{-1/2})^T \epsilon_i^*,
 \end{cases}
 $$
-After this linear transformation it can be shown that $\epsilon^*_i\sim \mathcal{N}(\mathbf{0},\sigma^2\mathbf{I})$. Therefore, we can rewrite the extended
-single level model as:
+
+After this linear transformation it can be shown that $\epsilon^*_i\sim \mathcal{N}(\mathbf{0},\sigma^2\mathbf{I})$. Therefore, we can rewrite the extended single level model as: 
+
 $$
+\begin{aligned}
 \mathbf{Y_i}^*_{n_i \times 1} = \mathbf{X}^*_i\beta + \mathbf{Z}^*_i\mathbf{b}_i + \epsilon^*_i,  i=1 , \dots, M \\
 \mathbf{b}_i \sim \mathbf{N}(0, \Sigma_{q\times q}), \ \epsilon^*_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i}),
+\end{aligned}
 $$
 
-Which takes the same form as the basic mixed model and can be solved with the same
-methods discussed in chapter 2 of [@pinheiro2006mixed]. 
-
-
+Which takes the same form as the basic mixed model and can be solved with the same methods discussed in chapter 2 of [@pinheiro2006mixed].
 
 ## Generalized Least Squares
-One important thing to note, is that if we are not be interested in the random 
-effects of the model we can choose to not incorporate them into the model. To do 
-this we use the within-group component $\Lambda_i$ to directly model the variance-covariance 
-matrix as seen below. 
+
+One important thing to note, is that if we are not be interested in the random effects of the model we can choose to not incorporate them into the model. To do this we use the within-group component $\Lambda_i$ to directly model the variance-covariance matrix as seen below.
 
 $$
+\begin{aligned}
 \mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta  + \epsilon_i,  i=1 , \dots, M \\
  \ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2\Lambda_{i: n_i \times n_i})
+\end{aligned}
 $$
 
-forming the generalized least squares model. Similar to the extended mixed model
-above, we can transform the model matrices by $\Lambda^{-1/2}$ leading to a "classic"
-linear regression problem
+forming the generalized least squares model. Similar to the extended mixed model above, we can transform the model matrices by $\Lambda^{-1/2}$ leading to a "classic" linear regression problem
 
 $$
+\begin{aligned}
 \mathbf{Y_i}^*_{n_i \times 1} = \mathbf{X}^*_i\beta + \epsilon^*_i,  i=1 , \dots, M \\
  \epsilon^*_i \sim \mathcal{N}(\mathbf{0},\sigma^2 \mathbf{I}_{n_i \times n_i})
-$$
-Therefore, the estimators for $\hat{\beta}$ and $\hat{\sigma}^2$ are found by solving
-the ordinary least squares problem for given values of $\lambda$. 
+\end{aligned}
+$$ 
+
+Therefore, the estimators for $\hat{\beta}$ and $\hat{\sigma}^2$ are found by solving the ordinary least squares problem for given values of $\lambda$.
 
 $$
 \hat{\beta}(\lambda) = [(\mathbf{X}^*)^T\mathbf{X}^*]^{-1}(\mathbf{X}^*)\mathbf{Y}^* \\ 
 \hat{\sigma}^2(\lambda) = \frac{\|\mathbf{Y}^* - \mathbf{X}^*\hat{\beta}(\lambda)\|}{N}
-$$
-The optimal value for $\Lambda$ is found by maximizing the profiled log-likelihood
-as described in [@pinheiro2006mixed].
+$$ 
 
-
+The optimal values for $\lambda$ is found by maximizing the profiled log-likelihood as described in [@pinheiro2006mixed].
