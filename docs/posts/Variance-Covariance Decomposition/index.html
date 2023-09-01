@@ -9,7 +9,7 @@
 <meta name="author" content="Joel Parker">
 <meta name="dcterms.date" content="2023-08-14">
 
-<title>Joel Parker’s Blog - Within Group Variance Decomposition</title>
+<title>Joel Parker’s Blog - Causal Inference in Statistics: A Primer. Preliminaries</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,26 +22,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -80,9 +61,10 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -129,10 +111,10 @@ div.csl-indent {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Within Group Variance Decomposition</h1>
+      <h1 class="title">Causal Inference in Statistics: A Primer. Preliminaries</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Statistics</div>
-                <div class="quarto-category">Tutorial</div>
+                <div class="quarto-category">Causal-Inference</div>
               </div>
                   </div>
   </div>
@@ -168,105 +150,158 @@ div.csl-indent {
 
 
 
-<section id="introductions" class="level2">
-<h2 class="anchored" data-anchor-id="introductions">Introductions</h2>
-<p>In the last post, <a href="https://joelparkeruofa.github.io/JoelParkerBlog/posts/Generalized%20Least%20Squares/">The Steps from Mixed Models to Generalized Least Squares</a>, I discussed how we can relax the assumption of the within group independence of the errors, and allow for correlations in the residuals and heterogeneity of errors. In this post I will discuss how we can decompose the within group variance-covariance matrix, <span class="math inline">\(\Lambda_i\)</span> to allow us to model the heterogenity and the correlation structures of the data separately and combine them into a flexible family of models. The information persented in this blog can be viewed as a summary of section 5.1.3 and 5.2 of Mixed effects Models in S and S-plus <span class="citation" data-cites="pinheiro2006mixed">(<a href="#ref-pinheiro2006mixed" role="doc-biblioref">Pinheiro and Bates 2006</a>)</span></p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>A few months ago an advisor of mine mentioned some of the brilliant work that was being done in the of causal inference. This was not the first time I had heard about causal inference and it was probably closer to the 25th, but as a PhD student with a full course load and a job, it was hard to find the time to dive into this area of statistics. Recently, I purchased the Book of Why by Judea Peal. My idea was to read this book as a form of “light” reading after a long day of class to help introduce me to some of the ideas within causal inference, after all, The Book of Why was written by Peal to introduce these ideas to a general audience. However, after the first chapter I found myself getting excited about the topic and wanting to learn more. I decided I needed to find a reference that was more intended for someone like me. Specifically, I wanted to see some formulas. I don’t know how I got to be this way but here I am, and a book, filled with text, filled with jargon, is now my preferred method of learning. Congratulations academia, the transformation is complete.</p>
+<p>Fast forward to now. I have completed my course work, working part time, and I am waiting for may adviser to get back leave so I can complete my comps. Please, don’t get me wrong, I still have PLENTY of work to do like writing my proposal, writing papers and studying for comps. However, I do believe that taking some time to expand my knowledge about an area of a field which I am getting a PhD in, is time well spent and who knows, maybe this could turn into part of my dissertation. Sounds like a win-win.</p>
+<p>The first book I will be reading is “Causal inference in statistics: a primer” by Judea Pearl, Madelyn Glymour, and Nicholas Jewell. This blog with serve as a way to me to take notes and refine my understanding about the topics discussed in this book.</p>
 </section>
-<section id="generalized-least-squares-review" class="level2">
-<h2 class="anchored" data-anchor-id="generalized-least-squares-review">Generalized Least Squares Review</h2>
-<p>To demonstrate these ideas we will be using a generalized least quares model (GLS), but these ideas can also be extended to mixed models as well. Below is a table of notations you can reference throughout this blog.</p>
+<section id="why-study-causation" class="level2">
+<h2 class="anchored" data-anchor-id="why-study-causation">Why Study Causation?</h2>
+<p>One of the questions tackled first section of this book is, what can the concept of causation, considered on it own, tell us about the world that tried and true statistical methods can not? If causation is well defined on it’s own, then we can use causation as an addition/addendum to traditional statistics. When used together, causal inference can uncover the workings of the world that traditional methods can not.</p>
+</section>
+<section id="simpsons-paradox" class="level2">
+<h2 class="anchored" data-anchor-id="simpsons-paradox">Simpsons Paradox</h2>
+<p>Simpsons paradox is discussed to introduce a motivation for causal inference. Statisticians are familiar with this paradox and Simpsons happens to be one of my favorite paradoxes to bring up with non-statistical friends. The idea that something can be good for men, good for woman and bad for the population, is allays mind boggling to people and to my myself. However, the authors did not just pull from a bag of clever examples just to demonstrate the importance of stratifying to help research make decisions about treatment effects. They demonstrated two examples which had opposite conclusions, despite having the same values after stratification.</p>
+<p>Consider example 1, where recovery rates were recorded of 700 patients after taking a drug. A total of 350 patients took the drug and 350 patients did not and the gender of each person was also recorded.</p>
 <table class="table">
+<caption><strong>Example 1</strong></caption>
 <colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 49%">
+<col style="width: 14%">
+<col style="width: 42%">
+<col style="width: 42%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Symbol</th>
-<th>Dimensions</th>
-<th>Representation</th>
+<th></th>
+<th>Drug</th>
+<th>No Drug</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><span class="math inline">\(y\)</span></td>
-<td></td>
-<td>Continuous Outcome</td>
+<td><strong>Men</strong></td>
+<td>81 out of 87 recovered (93%)</td>
+<td>234 out of 270 recovered (87%)</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(i\)</span></td>
-<td></td>
-<td>Group (Cluster) number</td>
+<td><strong>Woman</strong></td>
+<td>192 out of 263 recovered (73%)</td>
+<td>55 out of 80 recovered (69%)</td>
 </tr>
 <tr class="odd">
-<td><span class="math inline">\(n_i\)</span></td>
-<td></td>
-<td>Number of observations in the <span class="math inline">\(i^{th}\)</span> group</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\mathbf{y}_i\)</span></td>
-<td><span class="math inline">\(n_i \times 1\)</span></td>
-<td>Outcome vector for the <span class="math inline">\(i^{th}\)</span> group</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(M\)</span></td>
-<td></td>
-<td>number of groups</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(p\)</span></td>
-<td></td>
-<td>number of fixed effects</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\mathbf{b}\)</span></td>
-<td><span class="math inline">\(q\times 1\)</span></td>
-<td>matrix of random effects</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\mathbf{Z_i}\)</span></td>
-<td><span class="math inline">\(n_i \times q\)</span></td>
-<td>Random effects regression matrix</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\mathbf{X}_i\)</span></td>
-<td><span class="math inline">\(n_i \times p\)</span></td>
-<td>Fixed effects regression matrix</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(\beta\)</span></td>
-<td><span class="math inline">\(p \times 1\)</span></td>
-<td>Vector of fixed effects</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(\Lambda\)</span></td>
-<td><span class="math inline">\(n_i \times n_i\)</span></td>
-<td>Covariance matrix for within group errors</td>
+<td><strong>Total</strong></td>
+<td>273 out of 350 recovered (78%)</td>
+<td>289 out of 350 recovered (83%)</td>
 </tr>
 </tbody>
 </table>
-<p>We will start with a review of the GLS model disscussed <a href="https://joelparkeruofa.github.io/JoelParkerBlog/posts/Generalized%20Least%20Squares/">here</a>. Assume we have a continuous outcome variable <span class="math inline">\(y\)</span>. All <span class="math inline">\(n_i\)</span> observations from the <span class="math inline">\(i^{th}\)</span> group are expressed in an <span class="math inline">\(n_i\)</span> dimensional vector <span class="math inline">\(\mathbf{Y}_i\)</span>. We can model <span class="math inline">\(\mathbf{y}_i\)</span> as:</p>
-<p><span class="math display">\[
-\begin{aligned}
-\mathbf{Y_i}_{n_i \times 1} = \mathbf{X}_i\beta  + \epsilon_i,  i=1 , \dots, M \\
-\ \epsilon_i \sim \mathcal{N}(\mathbf{0},\sigma^2\Lambda_{i: n_i \times n_i})
-\end{aligned}
-\]</span></p>
-<p>Where <span class="math inline">\(\beta\)</span> is a <span class="math inline">\(p\)</span> dimensional vector of fixed effects, <span class="math inline">\(\mathbf{X}_i\)</span> is a <span class="math inline">\(n_i \times p\)</span> fixed effects matrix, and <span class="math inline">\(\Lambda_i\)</span> is the variance-covarince matrix for the <span class="math inline">\(i^{th}\)</span> group.</p>
+<p>When we look at the data in example 1, for both men and woman, people who took the drug showed higher recovery rates. However, when you remove the gender information and look at the population recovery rates, people who DID NOT take the drug showed higher recovery rates.</p>
+<p>In this example, how do we make conclusions about whether or not a person should take the drug? Should we base our conclusions on the overall population rate? Or, should we base our conclusions off of the men/woman sub-populations?</p>
+<p>The authors argue that the answers to these questions can not be found in the data alone. Instead, we must consider the causal mechanism that generated the results of the data. Suppose, that previous studies showed that estrogen negatively impacted recovery rates and that woman are significantly more likely to take the drug than men. Then we can say that being a woman is a common cause of taking the drug and failing to recover. Therefore, we need to compare recovery rates within gender and we should utilize the recovery rates from the men/woman sub populations.</p>
+<p>Now consider example 2, the results have the same recovery rates (with drug and no drug switched), but instead or recording gender, post-treatment blood pressure was recorded. Now would we want to use the overall recovery rates, or the stratified recovery rates? What if we knew that the effects recovery rates by lowering blood pressure? Since BP is one of the mechanisms that the drug effects treatment, we would want to use the general population rates.</p>
+<table class="table">
+<caption><strong>Example 2</strong></caption>
+<colgroup>
+<col style="width: 14%">
+<col style="width: 42%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>No Drug</th>
+<th>Drug</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Low BP</td>
+<td>81 out of 87 recovered (93%)</td>
+<td>234 out of 270 recovered (87%)</td>
+</tr>
+<tr class="even">
+<td>High BP</td>
+<td>192 out of 263 recovered (73%)</td>
+<td>55 out of 80 recovered (69%)</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td>273 out of 350 recovered (78%)</td>
+<td>289 out of 350 recovered (83%)</td>
+</tr>
+</tbody>
+</table>
+<p>The purpose of these two examples is to show that the decision to treat was not based on the data alone and required that we utilized information outside of the data. Statistics alone can not uncover the causal story. However, causal inference encompasses a set to tools that can be used to express and interpret causal assumptions. When used as an aid to statistics, we can uncover causal relationships.</p>
 </section>
-<section id="within-group-variance-decomposition" class="level2">
-
-
-
-
-</section>
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Within Group Variance Decomposition</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-pinheiro2006mixed" class="csl-entry" role="listitem">
-Pinheiro, José, and Douglas Bates. 2006. <em>Mixed-Effects Models in s and s-PLUS</em>. Springer science &amp; business media.
+<section id="structural-causal-models" class="level2">
+<h2 class="anchored" data-anchor-id="structural-causal-models">Structural Causal Models</h2>
+<p>The authors give some ideas about basic probability theory before moving on to the introduction of graphs and structural causal models. However, I am going to skip over the introduction to probablity and focus on graphs and SCM.</p>
+<section id="graphs" class="level3">
+<h3 class="anchored" data-anchor-id="graphs">Graphs</h3>
+<p>When talking about graphs it is easy to think about a collection of visualization tools which aid in our understanding of trends and patterns. However, in mathematics, graphs have a formal definition. A graph consists of two elements:</p>
+<ol type="1">
+<li>Nodes - Sometimes called vertices, are often represented as dots or circles.</li>
+<li>Edges - Are lines or arrows connecting the dot/circles.</li>
+</ol>
+<p>An example of nodes and edges may be simlar to what is displayed below. The edges of the graph can be directed (with arrow) or undirected (without and arrow).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+    A((A))---B((B))
+</pre>
 </div>
-</div></section></div></main> <!-- /main -->
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+    C((C))--&gt;D((D))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<p>When we have a directed graph and their exists a path from a node to a itself, this is referenced to as a cyclic graph.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+    A((A)) --&gt; B((B))
+    B --&gt; C((C))
+    C --&gt; A
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+<p>If no such path exists then this is called an <strong>acyclic graph</strong>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+    A((A)) --&gt; B((B))
+    B --&gt; C((C))
+    A --&gt; C
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
